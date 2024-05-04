@@ -25,16 +25,16 @@ The `variables.tf` file contains variable definitions used in the Terraform conf
 - `vpc_cidr`: The CIDR block for the VPC.
 - `public_subnet`: A map of public subnets with availability zone as key and CIDR block as value.
 - `private_subnet`: A map of private subnets with availability zone as key and CIDR block as value.
-- `cidr_block`: CIDR block to allow traffic via.
+- `cidr_block`: CIDR block to allow traffic via internet.
 - `alb_variables`: Configuration for the Application Load Balancer (ALB).
 
 ### Provider Configuration
 
-The `provider.tf` file specifies the provider configuration, including the AWS region and authentication details. Ensure your AWS access key and secret key are correctly configured.
+The `provider.tf` file specifies the provider configuration, including the AWS region and authentication details. Ensure your AWS access key and secret key are correctly configured during aws configure step.
 
 ### Main Configuration
 
-The `main.tf` file contains the main Terraform configuration, including resource definitions for the VPC, subnets, ALB, security groups, and EC2 instance.
+The `main.tf` file contains the main Terraform configuration for application server security groups, and EC2 instance details.
 
 ### Locals
 
@@ -42,11 +42,8 @@ The `locals.tf` file defines local values used within the Terraform configuratio
 
 ### ALB Configuration
 
-The ALB configuration is specified in `alb.tf`. It includes resource definitions for the ALB, ALB listener, and ALB target group.
+The ALB configuration is specified in `alb.tf`. It includes resource definitions for the ALB, ALB listener, and ALB target group and ALB security group.
 
-### Security Group Configuration
-
-Security group configurations for both the ALB and EC2 instance are defined in `main.tf`. Ingress and egress rules are specified to control traffic.
 
 ### VPC Configuration
 

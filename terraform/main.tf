@@ -33,7 +33,7 @@ resource "aws_security_group" "app_security_group" {
 
   tags = merge(local.required_tags, { Name = "EC2-Security-Group" })
 }
-#ec3 instance in private subnet
+#EC2 instance in private subnet
 resource "aws_instance" "application_server" {
   ami                    = "ami-0f58b397bc5c1f2e8"
   instance_type          = "t2.micro"
