@@ -1,0 +1,72 @@
+
+name: Build and Deploy to EKS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "kubernetes/deployment.yaml"
+      - "kubernetes/Dockerfile"
+      - "policy.json"
+
+jobs:
+  build:
+    env:
+        ECR_REGISTRY: 23344999900.dkr.ecr.ap-south-1.amazonaws.com
+        ECR_REPOSITORY: platform-infra-nginx
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set image tag to GitHub hash
+        id: set_tag
+        run: echo "::set-output name=TAG::$(git rev-parse --short HEAD)"
+
+      - name: builds docker image and pushes to ECR.
+        uses: docker://ghcr.io/kciter/aws-ecr-action:latest
+        with:
+          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID_NONPROD }}
+          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_NONPROD }}
+          account_id: ${{ secrets.AWS_ACCOUNT_ID_NONPROD }}
+          repo: ${{ env.ECR_REPOSITORY }}
+          region: ${{ secrets.AWS_REGION_NONPROD }}
+          create_repo: true
+          set_repo_policy: true
+          repo_policy_file: policy.json
+          image_scanning_configuration: true
+          tags: ${{ steps.set_tag.outputs.TAG }}
+          dockerfile: Dockerfile
+          path: "/"
+
+      - name: Update image tag in deployment.yaml
+        run: sed -i "s|image:.*|image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}|" taskrepo/kubernetes/deployment.yaml
+
+      - name: Commit and push updated deployment.yaml
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add taskrepo/deployment.yaml
+          git commit -m "Update image tag in deployment.yaml with GitHub hash (${github.sha})."
+          git push origin main
+
+      - name: deploy to cluster
+        uses: kodermax/kubectl-aws-eks@main
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+          ECR_REGISTRY: ${{ env.ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ steps.set_tag.outputs.TAG }}
+          KUBECTL_VERSION: "v1.28.0"
+          RUN_COMMAND: apply -f kubernetes/deployment.yaml
+
+          
+      - name: verify deployment
+        uses: kodermax/kubectl-aws-eks@main
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        with:
+          args: rollout status ${{ env.EKS_DEPLOYMENT }}

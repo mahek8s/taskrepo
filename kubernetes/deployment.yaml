@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-demo-deployment
+  name: platform-infra-nginx
   labels:
     app: app-nginx
 spec:
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: app-nginx
-        image: nginx:1.26.0-alpine3.19-perl # multiarch image 
+        image: 23344999900.dkr.ecr.ap-south-1.amazonaws.com/platform-infra-nginx:githash
         imagePullPolicy: IfNotPresent
         imagePullSecrets:
         - name: "regcred"
