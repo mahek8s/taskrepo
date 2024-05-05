@@ -1,0 +1,24 @@
+{  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "putObject",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::destinations3/*"
+      ]
+    },
+    {
+      "Sid": "getObject",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::sources3/*"
+      ]
+    }
+  ]
+}

@@ -49,6 +49,10 @@ The ALB configuration is specified in `alb.tf`. It includes resource definitions
 
 The VPC configuration, including public and private subnets, internet gateway, route table, and route table associations, is defined in `vpc.tf`.
 
+### ec2 autoscaling based on cpu utilization Configuration
+
+The launch template, autoscaling policy and cloudwatch alarms which trigger scaleup and scaledown are defined in `autoscaling.tf`.
+
 ## Usage
 
 1. **Initialize Terraform**: Run `terraform init` in the project directory to initialize Terraform and download the required providers.
